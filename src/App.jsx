@@ -42,21 +42,26 @@ const App = () => {
     setExpenses(updatedExpenses);
   };
 
-  const filteredExpenses = expenses.filter((item) =>
-    item.expense.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1 ||
-    item.description.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
-  );
+  const filteredExpenses = expenses.filter((item) => {
+    const name = item.expense.toLowerCase();
+    const description = item.description.toLowerCase();
+    const search = searchTerm.toLowerCase();
+  
+    return name.indexOf(search) > -1 || description.indexOf(search) > -1;
+  });
+  
 
   const sortedExpenses = [...filteredExpenses].sort((a, b) => {
     if (a.expense < b.expense) return -1;
     if (a.expense > b.expense) return 1;
     return 0;
   });
+  
 
   return (
     <div className="container">
       <div className="sidebar">
-        <h2>Add Expense</h2>
+        <h2><span>Add Expense</span></h2>
         <ExpenseForm
           formData={formData}
           handleChange={handleChange}
