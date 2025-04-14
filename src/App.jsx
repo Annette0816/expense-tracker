@@ -1,35 +1,77 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState } from "react";
+import "./App.css";
+import ExpensesData from "./components/ExpensesData";
+import ExpenseForm from "./components/ExpenseForm";
+import ExpenseTable from "./components/ExpenseTable";
+import SearchBar from "./components/SearchBar";
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const [expenses, setExpenses] = useState(ExpensesData);
+  const [formData, setFormData] = useState({
+    expense: "",
+    description: "",
+    category: "",
+    amount: "",
+    date: "",
+  });
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const newExpense = {
+      ...formData,
+      id: expenses.length + 1,
+      amount: Number(formData.amount),
+    };
+    setExpenses([...expenses, newExpense]);
+    setFormData({
+      expense: "",
+      description: "",
+      category: "",
+      amount: "",
+      date: "",
+    });
+  };
+
+  const handleDelete = (id) => {
+    const updatedExpenses = expenses.filter((item) => item.id !== id);
+    setExpenses(updatedExpenses);
+  };
+
+  const filteredExpenses = expenses.filter((item) =>
+    item.expense.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1 ||
+    item.description.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
+  );
+
+  const sortedExpenses = [...filteredExpenses].sort((a, b) => {
+    if (a.expense < b.expense) return -1;
+    if (a.expense > b.expense) return 1;
+    return 0;
+  });
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="container">
+      <div className="sidebar">
+        <h2>Add Expense</h2>
+        <ExpenseForm
+          formData={formData}
+          handleChange={handleChange}
+          handleSubmit={handleSubmit}
+        />
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
+      <div className="main">
+        <div className="header">
+          <h1>Expense Tracker</h1>
+          <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+        </div>
+        <ExpenseTable expenses={sortedExpenses} handleDelete={handleDelete} />
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    </div>
+  );
+};
 
-export default App
+export default App;
